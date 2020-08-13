@@ -1,0 +1,27 @@
+trigger:
+- master
+
+pool: 
+  vmImage: 'windows-2019'
+
+steps:
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(Build.SourcesDirectory)\Dsc'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(Build.SourcesDirectory)\SqlServerSingle.zip'
+    replaceExistingArchive: true
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.SourcesDirectory)'
+    ArtifactName: 'Source'
+    publishLocation: 'Container'
+- task: AzureFileCopy@3
+  inputs:
+    SourcePath: '$(Build.SourcesDirectory)\SqlServerSingle.zip'
+    azureSubscription: '<SUBSCRIPTION_NAME>(<SUBSCRIPTIONID>)'
+    Destination: 'AzureBlob'
+    storage: '<AZURE_STORAGE_ACCOUNTNAME>'
+    ContainerName: 'artifact'
+
